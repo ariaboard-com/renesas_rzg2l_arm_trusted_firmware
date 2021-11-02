@@ -484,6 +484,7 @@ static CPG_REG_SETTING cpg_static_select_tbl[] = {
 
 static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 	{ (uintptr_t)CPG_PL4_DSEL,              0x00010001 },
+	{ (uintptr_t)CPG_PL2SDHI_DSEL,          0x00110022 },
 };
 
 #define CPG_SEL_PLL1_ON_OFF					(0)
@@ -599,7 +600,6 @@ static CPG_REG_SETTING cpg_sel_gpu1_2_on_off[] = {
 static CPG_REG_SETTING cpg_sel_gpu2_on_off[] = {
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
 };
-
 
 static void cpg_ctrl_clkrst(CPG_SETUP_DATA const *array, uint32_t num)
 {
