@@ -31,27 +31,27 @@ fi
 
 make O=build PLAT=g2l BOARD=novotech bl2 bl31 fiptool
 
-rm -rf deploy/g2l-spi 2>/dev/null || true
-mkdir -p deploy/g2l-spi
+rm -rf deploy/g2l 2>/dev/null || true
+mkdir -p deploy/g2l
 
 "${WORKDIR}/tools/bootparameter/bootparameter" \
     "${WORKDIR}/build/g2l/release/bl2.bin" \
-    "${WORKDIR}/deploy/g2l-spi/bl2_bp.bin"
+    "${WORKDIR}/deploy/g2l/bl2_bp.bin"
 cat "${WORKDIR}/build/g2l/release/bl2.bin" >> \
-    "${WORKDIR}/deploy/g2l-spi/bl2_bp.bin"
+    "${WORKDIR}/deploy/g2l/bl2_bp.bin"
 
 fiptool create --align 16 --soc-fw "${WORKDIR}/build/g2l/release/bl31.bin" \
     --nt-fw "${WORKDIR}/../renesas-u-boot-cip/deploy/u-boot.bin" \
-    "${WORKDIR}/deploy/g2l-spi/fip.bin"
+    "${WORKDIR}/deploy/g2l/fip.bin"
 
 objcopy -O srec --adjust-vma=0x00011E00 --srec-forceS3 -I binary \
-    "${WORKDIR}/deploy/g2l-spi/bl2_bp.bin" \
-    "${WORKDIR}/deploy/g2l-spi/bl2_bp.srec"
+    "${WORKDIR}/deploy/g2l/bl2_bp.bin" \
+    "${WORKDIR}/deploy/g2l/bl2_bp.srec"
 objcopy -I binary -O srec --adjust-vma=0x0000 --srec-forceS3 \
-    "${WORKDIR}/deploy/g2l-spi/fip.bin" \
-    "${WORKDIR}/deploy/g2l-spi/fip.srec"
+    "${WORKDIR}/deploy/g2l/fip.bin" \
+    "${WORKDIR}/deploy/g2l/fip.srec"
 
-#cp -v build/rcar/release/bl2.srec deploy/g2l-spi/bl2.srec
-#cp -v build/rcar/release/bl31.srec deploy/g2l-spi/bl31.srec
-#cp -v tools/dummy_create/bootparam_sa0.srec deploy/g2l-spi/bootparam_sa0.srec
-#cp -v tools/dummy_create/cert_header_sa6.srec deploy/g2l-spi/cert_header_sa6.srec
+#cp -v build/rcar/release/bl2.srec deploy/g2l/bl2.srec
+#cp -v build/rcar/release/bl31.srec deploy/g2l/bl31.srec
+#cp -v tools/dummy_create/bootparam_sa0.srec deploy/g2l/bootparam_sa0.srec
+#cp -v tools/dummy_create/cert_header_sa6.srec deploy/g2l/cert_header_sa6.srec
