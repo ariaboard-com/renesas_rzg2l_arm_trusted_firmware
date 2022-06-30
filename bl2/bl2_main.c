@@ -22,6 +22,10 @@
 
 #include "bl2_private.h"
 
+#include <cpg_regs.h>
+#include <cpg.h>
+#include <lib/mmio.h>
+
 #ifdef __aarch64__
 #define NEXT_IMAGE	"BL31"
 #else
@@ -73,6 +77,12 @@ void bl2_el3_setup(u_register_t arg0, u_register_t arg1, u_register_t arg2,
 }
 #endif /* BL2_AT_EL3 */
 
+void cpu_cpg_setup(void)
+{
+        mmio_write_32(CPG_PL1_DDIV, PL1_DDIV_DIVPL1_SET_WEN | PL1_DDIV_DIVPL1_SET_1_8);
+        mmio_write_32(CPG_PL1_DDIV, PL1_DDIV_DIVPL1_SET_WEN | PL1_DDIV_DIVPL1_SET_1_1);
+}
+
 /*******************************************************************************
  * The only thing to do in BL2 is to load further images and pass control to
  * next BL. The memory occupied by BL2 will be reclaimed by BL3x stages. BL2
@@ -102,6 +112,9 @@ void bl2_main(void)
 	/* Initialize boot source */
 	bl2_plat_preload_setup();
 
+	/* Init CPU_CPG */
+	cpu_cpg_setup();
+	
 	/* Load the subsequent bootloader images. */
 	next_bl_ep_info = bl2_load_images();
 
