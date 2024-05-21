@@ -9,6 +9,7 @@
 #include <cpg.h>
 #include <lib/mmio.h>
 #include <drivers/delay_timer.h>
+#include <cpg_opt.h>
 
 #define	CPG_OFF			(0)
 #define	CPG_ON			(1)
@@ -118,6 +119,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00010000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* GPT */
 		(uintptr_t)CPG_CLKON_GPT,
 		(uintptr_t)CPG_CLKMON_GPT,
@@ -130,10 +132,15 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x000F0000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* WDT */
 		(uintptr_t)CPG_CLKON_WDT,
 		(uintptr_t)CPG_CLKMON_WDT,
+#if RZG2UL
+		0x00300000,
+#else
 		0x003C0000,
+#endif
 		CPG_T_CLK
 	},
 #if !DEBUG_RZG2L_FPGA
@@ -163,36 +170,42 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00ff00ff,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* GPU */
 		(uintptr_t)CPG_CLKON_GPU,
 		(uintptr_t)CPG_CLKMON_GPU,
 		0x00070000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* Image Scaling Unit */
 		(uintptr_t)CPG_CLKON_ISU,
 		(uintptr_t)CPG_CLKMON_ISU,
 		0x00030000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* H.264 codec */
 		(uintptr_t)CPG_CLKON_H264,
 		(uintptr_t)CPG_CLKMON_H264,
 		0x00010001,
 		CPG_T_CLK
 	},
+#endif
 	{		/* Camera Data Receive Unit */
 		(uintptr_t)CPG_CLKON_CRU,
 		(uintptr_t)CPG_CLKMON_CRU,
 		0x001f0000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* MIPI-DSI */
 		(uintptr_t)CPG_CLKON_MIPI_DSI,
 		(uintptr_t)CPG_CLKMON_MIPI_DSI,
 		0x003f0000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* LCDC */
 		(uintptr_t)CPG_CLKON_LCDC,
 		(uintptr_t)CPG_CLKMON_LCDC,
@@ -316,6 +329,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00010000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* GPT */
 		(uintptr_t)CPG_RST_GPT,
 		(uintptr_t)CPG_RSTMON_GPT,
@@ -328,10 +342,15 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x000f0000,
 		CPG_T_RST
 	},
+#endif
 	{		/* WDT */
 		(uintptr_t)CPG_RST_WDT,
 		(uintptr_t)CPG_RSTMON_WDT,
+#if RZG2UL
+		0x00040000,
+#else
 		0x00060000,
+#endif
 		CPG_T_RST
 	},
 #if !DEBUG_RZG2L_FPGA
@@ -361,36 +380,42 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00030003,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* GPU */
 		(uintptr_t)CPG_RST_GPU,
 		(uintptr_t)CPG_RSTMON_GPU,
 		0x00070000,
 		CPG_T_RST
 	},
+#endif
 	{		/* Image Scaling Unit */
 		(uintptr_t)CPG_RST_ISU,
 		(uintptr_t)CPG_RSTMON_ISU,
 		0x00030000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* H.264 codec */
 		(uintptr_t)CPG_RST_H264,
 		(uintptr_t)CPG_RSTMON_H264,
 		0x00030003,
 		CPG_T_RST
 	},
+#endif
 	{		/* Camera Data Receive Unit */
 		(uintptr_t)CPG_RST_CRU,
 		(uintptr_t)CPG_RSTMON_CRU,
 		0x00070000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* MIPI-DSI */
 		(uintptr_t)CPG_RST_MIPI_DSI,
 		(uintptr_t)CPG_RSTMON_MIPI_DSI,
 		0x00070000,
 		CPG_T_RST
 	},
+#endif
 	{		/* LCDC */
 		(uintptr_t)CPG_RST_LCDC,
 		(uintptr_t)CPG_RSTMON_LCDC,
@@ -484,7 +509,7 @@ static CPG_REG_SETTING cpg_static_select_tbl[] = {
 
 static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 	{ (uintptr_t)CPG_PL4_DSEL,              0x00010001 },
-	{ (uintptr_t)CPG_PL2SDHI_DSEL,          0x00110022 },
+	{ (uintptr_t)CPG_PL2SDHI_DSEL, 		0x00110022 },
 };
 
 #define CPG_SEL_PLL1_ON_OFF					(0)
@@ -513,7 +538,9 @@ static CPG_REG_SETTING cpg_sel_pll2_1_on_off[] = {
 
 static CPG_REG_SETTING cpg_sel_pll2_2_on_off[] = {
 	{(uintptr_t)CPG_CLKON_SDHI, 0x00770077 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00200020 },
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
@@ -531,14 +558,18 @@ static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
 	{(uintptr_t)CPG_CLKON_DDR, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_ETH, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_GIC600, 0x00010001 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00070007 },
 	{(uintptr_t)CPG_CLKON_H264, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_IA55, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_IM33, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_ISU, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_JAUTH, 0x00010001 },
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00010001 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x000C000C },
+#endif
 	{(uintptr_t)CPG_CLKON_OTP, 0x00020002 },
 	{(uintptr_t)CPG_CLKON_PERI_COM, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_PERI_CPU, 0x000D000D },
@@ -557,8 +588,10 @@ static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
 
 static CPG_REG_SETTING cpg_sel_pll3_2_on_off[] = {
 	{(uintptr_t)CPG_CLKON_CRU, 0x00030003 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00020002 },
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_SPI_MULTI, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_AXI_MCPU_BUS, 0x02080208 },
 };
@@ -569,37 +602,54 @@ static CPG_REG_SETTING cpg_sel_pll3_3_on_off[] = {
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_CRU, 0x00100010 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_3_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_4_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll6_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu1_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu1_2_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu2_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
+
 
 static void cpg_ctrl_clkrst(CPG_SETUP_DATA const *array, uint32_t num)
 {
@@ -775,7 +825,7 @@ static void cpg_reset_setup(void)
 void cpg_active_ddr(void (*disable_phy)(void))
 {
 	/* Assert the reset of DDRTOP */
-	mmio_write_32(CPG_RST_DDR, 0x005F0000);
+	mmio_write_32(CPG_RST_DDR, 0x005F0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005F) != 0x0000005F)
 		;
@@ -802,7 +852,7 @@ void cpg_active_ddr(void (*disable_phy)(void))
 	disable_phy();
 
 	/* De-assert axiY_ARESETn, regARESETn, reset_n */
-	mmio_write_32(CPG_RST_DDR, 0x005D005D);
+	mmio_write_32(CPG_RST_DDR, 0x005D005D | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005D) != 0x00000000)
 		;
 
@@ -812,7 +862,7 @@ void cpg_active_ddr(void (*disable_phy)(void))
 void cpg_reset_ddr_mc(void)
 {
 	/* Assert rst_n, axiY_ARESETn, regARESETn */
-	mmio_write_32(CPG_RST_DDR, 0x005C0000);
+	mmio_write_32(CPG_RST_DDR, 0x005C0000 | (CPG_RST_DDR_OPT_VALUE << 16));
 	mmio_write_32(CPG_OTHERFUNC2_REG, 0x00010000);
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x0000005C)
 		;
@@ -825,7 +875,7 @@ void cpg_reset_ddr_mc(void)
 	udelay(1);
 
 	/* De-assert axiY_ARESETn, regARESETn */
-	mmio_write_32(CPG_RST_DDR, 0x005C005C);
+	mmio_write_32(CPG_RST_DDR, 0x005C005C | (CPG_RST_DDR_OPT_VALUE << 16) | CPG_RST_DDR_OPT_VALUE);
 	while ((mmio_read_32(CPG_RSTMON_DDR) & 0x0000005C) != 0x00000000)
 		;
 
@@ -837,6 +887,17 @@ void cpg_early_setup(void)
 	cpg_ctrl_clkrst(&early_setup_tbl[0], ARRAY_SIZE(early_setup_tbl));
 }
 
+void cpg_wdtrst_sel_setup(void)
+{
+	uint32_t reg;
+	reg = mmio_read_32(CPG_WDTRST_SEL);
+	reg |=
+		WDTRST_SEL_WDTRSTSEL0 | WDTRST_SEL_WDTRSTSEL0_WEN |
+		WDTRST_SEL_WDTRSTSEL1 | WDTRST_SEL_WDTRSTSEL1_WEN |
+		WDTRST_SEL_WDTRSTSEL2 | WDTRST_SEL_WDTRSTSEL2_WEN ;
+	mmio_write_32(CPG_WDTRST_SEL, reg);
+}
+
 void cpg_setup(void)
 {
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_OFF);
@@ -846,4 +907,5 @@ void cpg_setup(void)
 	cpg_clk_on_setup();
 	cpg_reset_setup();
 	cpg_div_sel_dynamic_setup();
+	cpg_wdtrst_sel_setup();
 }
