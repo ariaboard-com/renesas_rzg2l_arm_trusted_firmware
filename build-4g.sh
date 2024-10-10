@@ -20,7 +20,7 @@ export CORES=`getconf _NPROCESSORS_ONLN`
 export CROSS_COMPILE="aarch64-none-elf-"
 export PATH="${WORKDIR}/../gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin:${WORKDIR}/tools/fiptool:${WORKDIR}/tools/bootparameter:$PATH"
 
-if [ x"$1" = x"mrprober" ]; then
+if [ x"$1" = x"mrproper" ]; then
    rm -rf build 2>/dev/null || true
    make distclean
 fi
